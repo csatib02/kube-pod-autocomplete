@@ -20,8 +20,12 @@ up: ## Start development environment
 down: ## Stop development environment
 	${KIND_BIN} delete cluster --name kube-pod-autocomplete
 
+.PHONY: deploy
+deploy: ## Deploy kube-pod-autocomplete to the development environment
+	kubectl apply -f deploy/
+
 .PHONY: deploy-testdata
-deploy-testdata: ## Deploy to development environment
+deploy-testdata: ## Deploy testdata to the development environment
 	kubectl create ns staging
 	kubectl create ns prod
 	kubectl apply -f test/testdata/
