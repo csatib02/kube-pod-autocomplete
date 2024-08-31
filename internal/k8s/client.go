@@ -7,19 +7,28 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	kubernetesConfig "sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
 type Client struct {
-	clientset *kubernetes.Clientset
+	clientset kubernetes.Interface
 }
 
-func NewClient(clientset *kubernetes.Clientset) *Client {
-	return &Client{
-		clientset: clientset,
+func NewClient() (*Client, error) {
+	kubeConfig, err := kubernetesConfig.GetConfig()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get kubeconfig: %w", err)
 	}
+
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create clientset: %w", err)
+	}
+
+	return &Client{clientset: clientset}, nil
 }
 
-func (c *Client) ListPods(ctx context.Context) ([]podInfo, error) {
+func (c *Client) ListPods(ctx context.Context) (*v1.PodList, error) {
 	pods, err := c.clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pods: %w", err)
@@ -30,20 +39,5 @@ func (c *Client) ListPods(ctx context.Context) ([]podInfo, error) {
 		return nil, fmt.Errorf("failed to list pods: no pods found")
 	}
 
-	return extractPodInfos(pods), nil
-}
-
-// extractPodInfos extracts pod information from a list of pods
-func extractPodInfos(pods *v1.PodList) []podInfo {
-	var podInfos []podInfo
-	for _, pod := range pods.Items {
-		podInfo := podInfo{
-			Name:      pod.Name,
-			Namespace: pod.Namespace,
-			Phase:     string(pod.Status.Phase),
-			Labels:    pod.Labels,
-		}
-		podInfos = append(podInfos, podInfo)
-	}
-	return podInfos
+	return pods, nil
 }
