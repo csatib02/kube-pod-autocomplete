@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-in-staging-ns
+  namespace: staging
+spec:
+  containers:
+  - name: pod-in-staging-ns
+    image: nginx
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        cpu: "1"
+        memory: "512Mi"

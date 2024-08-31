@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-database-label
+  labels:
+    app.kubernetes.io/component: database
+spec:
+  containers:
+  - name: pod-with-database-label
+    image: mysql
+    ports:
+    - containerPort: 80
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: password
+    resources:
+      limits:
+        cpu: "1"
+        memory: "512Mi"

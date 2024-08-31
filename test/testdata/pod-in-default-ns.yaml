@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-in-default-ns
+  namespace: default
+spec:
+  containers:
+  - name: pod-in-default-ns
+    image: nginx
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        cpu: "1"
+        memory: "512Mi"

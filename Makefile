@@ -12,6 +12,19 @@ help: ## Display this help
 
 ##@ Development
 
+.PHONY: up
+up: ## Start development environment
+	${KIND_BIN} create cluster --name kube-pod-autocomplete
+
+.PHONY: down
+down: ## Stop development environment
+	${KIND_BIN} delete cluster --name kube-pod-autocomplete
+
+.PHONY: deploy-testdata
+deploy-testdata: ## Deploy to development environment
+	kubectl create ns staging
+	kubectl create ns prod
+	kubectl apply -f test/testdata/
 
 ##@ Build
 
@@ -45,15 +58,22 @@ fmt: ## Format code
 
 ##@ Dependencies
 
-deps: bin/golangci-lint
+deps: bin/golangci-lint bin/kind
 deps: ## Install dependencies
 
 # Dependency versions
 GOLANGCI_LINT_VERSION = 1.60.3
+KIND_VERSION = 0.24.0
 
 # Dependency binaries
 GOLANGCI_LINT_BIN := golangci-lint
+KIND_BIN := kind
 
 bin/golangci-lint:
 	@mkdir -p bin
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- v${GOLANGCI_LINT_VERSION}
+
+bin/kind:
+	@mkdir -p bin
+	curl -Lo bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-$(shell uname -s | tr '[:upper:]' '[:lower:]')-$(shell uname -m | sed -e "s/aarch64/arm64/; s/x86_64/amd64/")
+	@chmod +x bin/kind
