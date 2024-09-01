@@ -23,7 +23,6 @@ type Config struct {
 	LogServerAddress string   `mapstructure:"log_server"`
 }
 
-// LoadConfig reads and parses the configuration file
 func LoadConfig() (*Config, error) {
 	v := viper.NewWithOptions(
 		viper.KeyDelimiter("."),

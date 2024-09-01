@@ -30,7 +30,7 @@ func NewAutoCompleteService() (*Service, error) {
 	}, nil
 }
 
-// GetAutocompleteSuggestions returns a list of suggestions for the given query
+// GetAutocompleteSuggestions returns a list of suggestions (for the given query)
 func (s *Service) GetAutocompleteSuggestions(ctx context.Context, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
 	// If no filters are requested, use all supported filters
 	if len(requestedFilters) == 0 {
@@ -47,16 +47,16 @@ func (s *Service) GetAutocompleteSuggestions(ctx context.Context, requestedFilte
 
 // extractSuggestions extracts suggestions from the given pods based on the requested filters
 func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
-	filterInfos, err := filter.ParseFilters(requestedFilters)
+	fieldFilters, err := filter.ParseFilters(requestedFilters)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse filters: %w", err)
 	}
 
-	suggestions := make([]model.Suggestion, 0, len(*filterInfos))
-	for _, filterInfo := range *filterInfos {
-		extractedData := filterInfo.Extractor.Extract(pods)
+	suggestions := make([]model.Suggestion, 0, len(*fieldFilters))
+	for _, fieldFilter := range *fieldFilters {
+		extractedData := fieldFilter.Extractor.Extract(pods)
 
-		switch filterInfo.Type {
+		switch fieldFilter.Type {
 		case filter.ListFilter:
 			listData, ok := extractedData.([]string)
 			if !ok {
@@ -64,7 +64,7 @@ func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string
 			}
 
 			suggestions = append(suggestions, model.Suggestion{
-				Key:    filterInfo.ForField,
+				Key:    fieldFilter.FieldName,
 				Values: listData,
 			})
 
@@ -74,12 +74,18 @@ func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string
 				return nil, errors.New("invalid data type for MapFilter")
 			}
 
-			s.processMapSuggestion(&suggestions, filterInfo.ForField, &mapData)
+			s.processMapSuggestion(&suggestions, fieldFilter.FieldName, &mapData)
 
 		default:
-			return nil, fmt.Errorf("unsupported filter type: %v", filterInfo.Type)
+			return nil, fmt.Errorf("unsupported filter type: %v", fieldFilter.Type)
 		}
 	}
+
+	// These should be filter options on the UI
+	filterOptions := filter.FilterOptions{}
+
+	filterOptions.RemoveDuplicateValues(&suggestions)
+	filterOptions.RemoveIgnoredKeys(&suggestions)
 
 	return &model.AutocompleteSuggestions{Suggestions: suggestions}, nil
 }

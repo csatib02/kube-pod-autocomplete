@@ -17,7 +17,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// setup logger
 	utils.InitLogger(config)
 
 	server, err := server.New(config)

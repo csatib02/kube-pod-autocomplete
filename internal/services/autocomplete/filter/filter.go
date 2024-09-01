@@ -8,23 +8,23 @@ import (
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
 
-type FilterType int
+type FieldType int
 
 const (
-	ListFilter FilterType = iota
+	ListFilter FieldType = iota
 	MapFilter
 )
 
-type FilterInfo struct {
-	Type      FilterType
-	ForField  string
+type FieldFilter struct {
+	Type      FieldType
+	FieldName string
 	Extractor model.FieldExtractor
 }
 
-var supportedFilters = map[string]FilterInfo{
+var supportedFilters = map[string]FieldFilter{
 	"namespace": {
-		Type:     ListFilter,
-		ForField: "namespace",
+		Type:      ListFilter,
+		FieldName: "namespace",
 		Extractor: model.ListExtractor(func(pods *v1.PodList) interface{} {
 			result := make([]string, 0, len(pods.Items))
 			for _, pod := range pods.Items {
@@ -34,8 +34,8 @@ var supportedFilters = map[string]FilterInfo{
 		}),
 	},
 	"phase": {
-		Type:     ListFilter,
-		ForField: "phase",
+		Type:      ListFilter,
+		FieldName: "phase",
 		Extractor: model.ListExtractor(func(pods *v1.PodList) interface{} {
 			result := make([]string, 0, len(pods.Items))
 			for _, pod := range pods.Items {
@@ -45,8 +45,8 @@ var supportedFilters = map[string]FilterInfo{
 		}),
 	},
 	"labels": {
-		Type:     MapFilter,
-		ForField: "labels",
+		Type:      MapFilter,
+		FieldName: "labels",
 		Extractor: model.MapExtractor(func(pods *v1.PodList) interface{} {
 			result := make(map[string][]string)
 			for _, pod := range pods.Items {
@@ -58,8 +58,8 @@ var supportedFilters = map[string]FilterInfo{
 		}),
 	},
 	"annotations": {
-		Type:     MapFilter,
-		ForField: "annotations",
+		Type:      MapFilter,
+		FieldName: "annotations",
 		Extractor: model.MapExtractor(func(pods *v1.PodList) interface{} {
 			result := make(map[string][]string)
 			for _, pod := range pods.Items {
@@ -81,11 +81,11 @@ func GetSupportedFilters() []string {
 	return filters
 }
 
-func ParseFilters(filter []string) (*[]FilterInfo, error) {
-	var filters []FilterInfo
+func ParseFilters(filter []string) (*[]FieldFilter, error) {
+	var filters []FieldFilter
 	for _, f := range filter {
-		if info, ok := supportedFilters[f]; ok {
-			filters = append(filters, info)
+		if fieldFilter, ok := supportedFilters[f]; ok {
+			filters = append(filters, fieldFilter)
 		}
 	}
 

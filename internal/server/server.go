@@ -16,12 +16,6 @@ type Server struct {
 	config *config.Config
 }
 
-// type Config struct {
-// 	KubeClient        kubernetes.Interface
-// 	UseCache          bool
-// 	CacheUpdatePeriod time.Duration
-// }
-
 func New(config *config.Config) (*Server, error) {
 	// Init gin router and set up middlewares
 	// TODO: Add Auth middleware
@@ -62,11 +56,3 @@ func New(config *config.Config) (*Server, error) {
 func (s *Server) Run() error {
 	return s.router.Run(s.config.ListenAddress)
 }
-
-// // metaMiddleware adds middleware to the gin Context.
-// func metaMiddleware() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		c.Header("X-Whom", h.agent.config.NodeName)
-// 		c.Next()
-// 	}
-// }

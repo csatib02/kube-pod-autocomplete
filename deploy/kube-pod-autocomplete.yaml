@@ -31,3 +31,18 @@ spec:
           limits:
             cpu: "1"
             memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-pod-autocomplete
+  namespace: kube-pod-autocomplete
+spec:
+  selector:
+    app.kubernetes.io/name: kube-pod-autocomplete
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
