@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/csatib02/kube-pod-autocomplete/internal/k8s"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/filter"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
@@ -31,50 +29,49 @@ func NewAutoCompleteService() (*Service, error) {
 }
 
 // GetAutocompleteSuggestions returns a list of suggestions (for the given query)
-func (s *Service) GetAutocompleteSuggestions(ctx context.Context, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
-	// If no filters are requested, use all supported filters
-	if len(requestedFilters) == 0 {
-		requestedFilters = filter.GetSupportedFilters()
+func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.AutoCompleteRequest) (*model.AutocompleteSuggestions, error) {
+	// if no ResourceType is provided, default to Pod
+	if req.ResourceType == "" {
+		req.ResourceType = model.PodResourceType
 	}
 
-	pods, err := s.k8sClient.ListPods(ctx)
+	filters, err := filter.NewFieldFilters(req.ResourceType, &req.Filters)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get field filters: %w", err)
+	}
+
+	resources, err := s.k8sClient.ListResource(ctx, req.ResourceType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pods: %w", err)
 	}
 
-	return s.extractSuggestions(pods, requestedFilters)
+	return s.extractSuggestions(resources, filters)
 }
 
 // extractSuggestions extracts suggestions from the given pods based on the requested filters
-func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
-	fieldFilters, err := filter.ParseFilters(requestedFilters)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse filters: %w", err)
-	}
-
-	suggestions := make([]model.Suggestion, 0, len(*fieldFilters))
-	for _, fieldFilter := range *fieldFilters {
-		extractedData := fieldFilter.Extractor.Extract(pods)
-
+func (s *Service) extractSuggestions(resources model.Resource, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
+	suggestions := make([]model.Suggestion, 0, len(*filters))
+	for fieldName, fieldFilter := range *filters {
+		extractedData := fieldFilter.Extractor.Extract(resources)
 		switch fieldFilter.Type {
-		case filter.ListFilter:
+		case model.ListFilter:
 			listData, ok := extractedData.([]string)
 			if !ok {
 				return nil, errors.New("invalid data type for ListFilter")
 			}
 
 			suggestions = append(suggestions, model.Suggestion{
-				Key:    fieldFilter.FieldName,
+				Key:    fieldName,
 				Values: listData,
 			})
 
-		case filter.MapFilter:
+		case model.MapFilter:
 			mapData, ok := extractedData.(map[string][]string)
 			if !ok {
 				return nil, errors.New("invalid data type for MapFilter")
 			}
 
-			s.processMapSuggestion(&suggestions, fieldFilter.FieldName, &mapData)
+			s.processMapSuggestion(&suggestions, fieldName, &mapData)
 
 		default:
 			return nil, fmt.Errorf("unsupported filter type: %v", fieldFilter.Type)
@@ -82,7 +79,7 @@ func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string
 	}
 
 	// These should be filter options on the UI
-	filterOptions := filter.FilterOptions{}
+	filterOptions := filter.Options{}
 
 	filterOptions.RemoveDuplicateValues(&suggestions)
 	filterOptions.RemoveIgnoredKeys(&suggestions)

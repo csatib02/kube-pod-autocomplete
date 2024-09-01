@@ -8,6 +8,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	kubernetesConfig "sigs.k8s.io/controller-runtime/pkg/client/config"
+
+	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
 
 type Client struct {
@@ -28,7 +30,16 @@ func NewClient() (*Client, error) {
 	return &Client{clientset: clientset}, nil
 }
 
-func (c *Client) ListPods(ctx context.Context) (*v1.PodList, error) {
+func (c *Client) ListResource(ctx context.Context, resource model.Resource) (model.Resource, error) {
+	switch resource.(type) {
+	case model.ResourceType:
+		return c.listPods(ctx)
+	default:
+		return nil, fmt.Errorf("unsupported resource type")
+	}
+}
+
+func (c *Client) listPods(ctx context.Context) (*v1.PodList, error) {
 	pods, err := c.clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pods: %w", err)

@@ -7,14 +7,14 @@ import (
 )
 
 // FilterOptions defines additional options for filtering suggestions
-type FilterOptions struct{}
+type Options struct{}
 
 var ignoredKeys = map[string][]string{
 	"annotations": {"annotations:kubectl.kubernetes.io/last-applied-configuration"}, // Contains sensitive information
 }
 
 // RemoveDuplicateValues removes duplicate values from the suggestions
-func (fo *FilterOptions) RemoveDuplicateValues(suggestions *[]model.Suggestion) {
+func (o *Options) RemoveDuplicateValues(suggestions *[]model.Suggestion) {
 	for i, suggestion := range *suggestions {
 		valueMap := make(map[string]bool)
 		uniqueValues := []string{}
@@ -34,7 +34,7 @@ func (fo *FilterOptions) RemoveDuplicateValues(suggestions *[]model.Suggestion) 
 
 // RemoveIgnoredKeys removes the ignored keys from the suggestions
 // TODO: Get ignoreKeys from params
-func (fo *FilterOptions) RemoveIgnoredKeys(suggestions *[]model.Suggestion) {
+func (o *Options) RemoveIgnoredKeys(suggestions *[]model.Suggestion) {
 	filteredSuggestions := make([]model.Suggestion, 0, len(*suggestions))
 	for _, suggestion := range *suggestions {
 		ignored := false
