@@ -30,7 +30,7 @@ func NewClient() (*Client, error) {
 	return &Client{clientset: clientset}, nil
 }
 
-func (c *Client) ListResource(ctx context.Context, resource model.Resource) (model.Resource, error) {
+func (c *Client) ListResource(ctx context.Context, resource model.Resources) (model.Resources, error) {
 	switch resource.(type) {
 	case model.ResourceType:
 		return c.listPods(ctx)

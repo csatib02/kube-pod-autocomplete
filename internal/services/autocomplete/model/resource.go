@@ -9,7 +9,7 @@ const (
 	PodResourceType ResourceType = "Pod"
 )
 
-// Resource is an interface that represents the actual resource type
-type Resource interface{}
+// Resources is an interface that represents the actual resource type
+type Resources interface{}
 
-type PodResource = *v1.PodList
+type PodResources = *v1.PodList

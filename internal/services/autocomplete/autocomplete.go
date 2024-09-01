@@ -49,7 +49,7 @@ func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.Auto
 }
 
 // extractSuggestions extracts suggestions from the given pods based on the requested filters
-func (s *Service) extractSuggestions(resources model.Resource, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
+func (s *Service) extractSuggestions(resources model.Resources, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
 	suggestions := make([]model.Suggestion, 0, len(*filters))
 	for fieldName, fieldFilter := range *filters {
 		extractedData := fieldFilter.Extractor.Extract(resources)
@@ -87,10 +87,10 @@ func (s *Service) extractSuggestions(resources model.Resource, filters *map[stri
 	return &model.AutocompleteSuggestions{Suggestions: suggestions}, nil
 }
 
-func (s *Service) processMapSuggestion(suggestions *[]model.Suggestion, filter string, mapData *map[string][]string) {
+func (s *Service) processMapSuggestion(suggestions *[]model.Suggestion, filterName string, mapData *map[string][]string) {
 	for key, value := range *mapData {
 		*suggestions = append(*suggestions, model.Suggestion{
-			Key:    fmt.Sprintf("%s:%s", filter, key),
+			Key:    fmt.Sprintf("%s:%s", filterName, key),
 			Values: value,
 		})
 	}

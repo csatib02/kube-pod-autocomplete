@@ -7,8 +7,8 @@ import (
 var supportedFilters = map[string]model.FieldFilter{
 	"namespace": {
 		Type: model.ListFilter,
-		Extractor: model.ListExtractor(func(resource model.Resource) interface{} {
-			podResource := resource.(model.PodResource)
+		Extractor: model.ListExtractor(func(resource model.Resources) interface{} {
+			podResource := resource.(model.PodResources)
 			result := make([]string, 0, len(podResource.Items))
 			for _, pod := range podResource.Items {
 				result = append(result, pod.Namespace)
@@ -18,8 +18,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"phase": {
 		Type: model.ListFilter,
-		Extractor: model.ListExtractor(func(resource model.Resource) interface{} {
-			podResource := resource.(model.PodResource)
+		Extractor: model.ListExtractor(func(resource model.Resources) interface{} {
+			podResource := resource.(model.PodResources)
 			result := make([]string, 0, len(podResource.Items))
 			for _, pod := range podResource.Items {
 				result = append(result, string(pod.Status.Phase))
@@ -29,8 +29,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"labels": {
 		Type: model.MapFilter,
-		Extractor: model.MapExtractor(func(resource model.Resource) interface{} {
-			podResource := resource.(model.PodResource)
+		Extractor: model.MapExtractor(func(resource model.Resources) interface{} {
+			podResource := resource.(model.PodResources)
 			result := make(map[string][]string)
 			for _, pod := range podResource.Items {
 				for key, value := range pod.Labels {
@@ -42,8 +42,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"annotations": {
 		Type: model.MapFilter,
-		Extractor: model.MapExtractor(func(resource model.Resource) interface{} {
-			podResource := resource.(model.PodResource)
+		Extractor: model.MapExtractor(func(resource model.Resources) interface{} {
+			podResource := resource.(model.PodResources)
 			result := make(map[string][]string)
 			for _, pod := range podResource.Items {
 				for key, value := range pod.Annotations {
@@ -58,7 +58,7 @@ var supportedFilters = map[string]model.FieldFilter{
 // GetFilters returns the supported filters based on the requested filters
 // if called with empty requestedFilters or nil, it returns all supported filters
 func GetFilters(requestedFilters *[]string) *map[string]model.FieldFilter {
-	if len(*requestedFilters) == 0 && requestedFilters == nil {
+	if requestedFilters == nil || len(*requestedFilters) == 0 {
 		return &supportedFilters
 	}
 
