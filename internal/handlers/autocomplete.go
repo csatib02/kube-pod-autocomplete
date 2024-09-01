@@ -40,6 +40,7 @@ func AutocompleteHandler(c *gin.Context) {
 		return
 	}
 	req.Filters = validFilters
+
 	autocompleteService, err := services.NewAutoCompleteService()
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to create autocomplete service: %w", err).Error())
