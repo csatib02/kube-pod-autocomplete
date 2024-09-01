@@ -14,8 +14,6 @@ RUN go build -o /usr/local/bin/kube-pod-autocomplete .
 
 FROM alpine:3.20.2@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5
 
-WORKDIR /app
-
 COPY --from=builder /usr/local/bin/kube-pod-autocomplete /usr/local/bin/kube-pod-autocomplete
 
 EXPOSE 8080
