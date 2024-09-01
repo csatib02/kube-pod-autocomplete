@@ -2,11 +2,13 @@ package autocomplete
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/csatib02/kube-pod-autocomplete/internal/k8s"
+	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/filter"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
 
@@ -29,55 +31,64 @@ func NewAutoCompleteService() (*Service, error) {
 }
 
 // GetAutocompleteSuggestions returns a list of suggestions for the given query
-func (s *Service) GetAutocompleteSuggestions(ctx context.Context, _ string) ([]model.Suggestion, error) {
-	// TODO: Implement the logic to fetch suggestions for the given query
+func (s *Service) GetAutocompleteSuggestions(ctx context.Context, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
+	// If no filters are requested, use all supported filters
+	if len(requestedFilters) == 0 {
+		requestedFilters = filter.GetSupportedFilters()
+	}
 
 	pods, err := s.k8sClient.ListPods(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pods: %w", err)
 	}
 
-	namespaces, phases, labels := s.extractPodData(pods)
-
-	suggestions := []model.Suggestion{
-		{Key: "namespace", Values: namespaces.ToSlice()},
-		{Key: "phase", Values: phases.ToSlice()},
-	}
-	suggestions = append(suggestions, s.formatLabelSuggestions(labels)...)
-
-	return suggestions, nil
+	return s.extractSuggestions(pods, requestedFilters)
 }
 
-// extractPodData extracts namespaces, phases, and labels information from the pods
-func (s *Service) extractPodData(pods *v1.PodList) (
-	*model.Set[string], *model.Set[string], map[string]*model.Set[string],
-) {
-	namespaces := model.NewSet[string]()
-	phases := model.NewSet[string]()
-	labels := make(map[string]*model.Set[string])
+// extractSuggestions extracts suggestions from the given pods based on the requested filters
+func (s *Service) extractSuggestions(pods *v1.PodList, requestedFilters []string) (*model.AutocompleteSuggestions, error) {
+	filterInfos, err := filter.ParseFilters(requestedFilters)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse filters: %w", err)
+	}
 
-	for _, pod := range pods.Items {
-		namespaces.Add(pod.Namespace)
-		phases.Add(string(pod.Status.Phase))
-		for key, value := range pod.Labels {
-			if labels[key] == nil {
-				labels[key] = model.NewSet[string]()
+	suggestions := make([]model.Suggestion, 0, len(*filterInfos))
+	for _, filterInfo := range *filterInfos {
+		extractedData := filterInfo.Extractor.Extract(pods)
+
+		switch filterInfo.Type {
+		case filter.ListFilter:
+			listData, ok := extractedData.([]string)
+			if !ok {
+				return nil, errors.New("invalid data type for ListFilter")
 			}
-			labels[key].Add(value)
+
+			suggestions = append(suggestions, model.Suggestion{
+				Key:    filterInfo.ForField,
+				Values: listData,
+			})
+
+		case filter.MapFilter:
+			mapData, ok := extractedData.(map[string][]string)
+			if !ok {
+				return nil, errors.New("invalid data type for MapFilter")
+			}
+
+			s.processMapSuggestion(&suggestions, filterInfo.ForField, &mapData)
+
+		default:
+			return nil, fmt.Errorf("unsupported filter type: %v", filterInfo.Type)
 		}
 	}
 
-	return namespaces, phases, labels
+	return &model.AutocompleteSuggestions{Suggestions: suggestions}, nil
 }
 
-func (s *Service) formatLabelSuggestions(labels map[string]*model.Set[string]) []model.Suggestion {
-	labelSuggestions := make([]model.Suggestion, 0, len(labels))
-	for key, labelSet := range labels {
-		labelSuggestions = append(labelSuggestions, model.Suggestion{
-			Key:    fmt.Sprintf("labels:%s", key),
-			Values: labelSet.ToSlice(),
+func (s *Service) processMapSuggestion(suggestions *[]model.Suggestion, filter string, mapData *map[string][]string) {
+	for key, value := range *mapData {
+		*suggestions = append(*suggestions, model.Suggestion{
+			Key:    fmt.Sprintf("%s:%s", filter, key),
+			Values: value,
 		})
 	}
-
-	return labelSuggestions
 }
