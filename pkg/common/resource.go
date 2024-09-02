@@ -1,4 +1,4 @@
-package model
+package common
 
 import v1 "k8s.io/api/core/v1"
 
@@ -9,8 +9,8 @@ const (
 	PodResourceType ResourceType = "pods"
 )
 
-// Resources is an interface that represents the actual resource type
-type Resources interface{}
+// Resources represents the actual resource type
+type Resources any
 
 type PodResources = *v1.PodList
 

@@ -2,13 +2,14 @@ package podfilter
 
 import (
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
+	"github.com/csatib02/kube-pod-autocomplete/pkg/common"
 )
 
 var supportedFilters = map[string]model.FieldFilter{
 	"namespace": {
 		Type: model.ListFilter,
-		Extractor: model.ListExtractor(func(resource model.Resources) interface{} {
-			podResource := resource.(model.PodResources)
+		Extractor: model.Extractor(func(resource common.Resources) interface{} {
+			podResource := resource.(common.PodResources)
 			result := make([]string, 0, len(podResource.Items))
 			for _, pod := range podResource.Items {
 				result = append(result, pod.Namespace)
@@ -18,8 +19,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"phase": {
 		Type: model.ListFilter,
-		Extractor: model.ListExtractor(func(resource model.Resources) interface{} {
-			podResource := resource.(model.PodResources)
+		Extractor: model.Extractor(func(resource common.Resources) interface{} {
+			podResource := resource.(common.PodResources)
 			result := make([]string, 0, len(podResource.Items))
 			for _, pod := range podResource.Items {
 				result = append(result, string(pod.Status.Phase))
@@ -29,8 +30,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"labels": {
 		Type: model.MapFilter,
-		Extractor: model.MapExtractor(func(resource model.Resources) interface{} {
-			podResource := resource.(model.PodResources)
+		Extractor: model.Extractor(func(resource common.Resources) interface{} {
+			podResource := resource.(common.PodResources)
 			result := make(map[string][]string)
 			for _, pod := range podResource.Items {
 				for key, value := range pod.Labels {
@@ -42,8 +43,8 @@ var supportedFilters = map[string]model.FieldFilter{
 	},
 	"annotations": {
 		Type: model.MapFilter,
-		Extractor: model.MapExtractor(func(resource model.Resources) interface{} {
-			podResource := resource.(model.PodResources)
+		Extractor: model.Extractor(func(resource common.Resources) interface{} {
+			podResource := resource.(common.PodResources)
 			result := make(map[string][]string)
 			for _, pod := range podResource.Items {
 				for key, value := range pod.Annotations {

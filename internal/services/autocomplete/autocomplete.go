@@ -8,6 +8,7 @@ import (
 	"github.com/csatib02/kube-pod-autocomplete/internal/k8s"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/filter"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
+	"github.com/csatib02/kube-pod-autocomplete/pkg/common"
 )
 
 type Service struct {
@@ -29,7 +30,7 @@ func NewAutoCompleteService() (*Service, error) {
 func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.AutoCompleteRequest) (*model.AutocompleteSuggestions, error) {
 	// if no ResourceType is provided, default to Pod
 	if req.ResourceType == "" {
-		req.ResourceType = model.PodResourceType
+		req.ResourceType = common.PodResourceType
 	}
 
 	filters, err := filter.NewFieldFilters(req.ResourceType, &req.Filters)
@@ -46,7 +47,7 @@ func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.Auto
 }
 
 // extractSuggestions extracts suggestions from the given pods based on the requested filters
-func (s *Service) extractSuggestions(resources model.Resources, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
+func (s *Service) extractSuggestions(resources common.Resources, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
 	suggestions := make([]model.Suggestion, 0, len(*filters))
 	for fieldName, fieldFilter := range *filters {
 		extractedData := fieldFilter.Extractor.Extract(resources)

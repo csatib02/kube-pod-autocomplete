@@ -1,5 +1,7 @@
 package model
 
+import "github.com/csatib02/kube-pod-autocomplete/pkg/common"
+
 type FieldType int
 
 const (
@@ -8,7 +10,7 @@ const (
 )
 
 type FieldFilter struct {
-	ResourceType ResourceType
+	ResourceType common.ResourceType
 	Type         FieldType
 	Extractor    FieldExtractor
 }

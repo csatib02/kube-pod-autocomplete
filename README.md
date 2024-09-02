@@ -4,6 +4,7 @@ Kube Pod Autocomplete is a Go-based backend service designed to enhance the user
 
 ## TODO
 
+- Tool to check openapi againts own implementation
 - Create docs.
 - Add caching idea to docs.
 

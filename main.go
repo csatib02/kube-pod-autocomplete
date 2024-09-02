@@ -7,7 +7,7 @@ import (
 
 	"github.com/csatib02/kube-pod-autocomplete/internal/config"
 	"github.com/csatib02/kube-pod-autocomplete/internal/server"
-	"github.com/csatib02/kube-pod-autocomplete/pkg/utils"
+	"github.com/csatib02/kube-pod-autocomplete/pkg/log"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	utils.InitLogger(config)
+	log.InitLogger(config)
 
 	server, err := server.New(config)
 	if err != nil {

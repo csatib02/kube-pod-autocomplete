@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
+	"github.com/csatib02/kube-pod-autocomplete/pkg/common"
 )
 
 type Client struct {
@@ -30,9 +30,9 @@ func NewClient() (*Client, error) {
 	return &Client{clientset: clientset}, nil
 }
 
-func (c *Client) ListResource(ctx context.Context, resource model.Resources) (model.Resources, error) {
+func (c *Client) ListResource(ctx context.Context, resource common.Resources) (common.Resources, error) {
 	switch resource.(type) {
-	case model.ResourceType:
+	case common.ResourceType:
 		return c.listPods(ctx)
 	default:
 		return nil, fmt.Errorf("unsupported resource type")

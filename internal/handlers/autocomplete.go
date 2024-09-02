@@ -10,9 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	services "github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete"
+	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete"
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
-	"github.com/csatib02/kube-pod-autocomplete/pkg/utils"
+	"github.com/csatib02/kube-pod-autocomplete/pkg/common"
+	httperror "github.com/csatib02/kube-pod-autocomplete/pkg/http"
 )
 
 // AutocompleteHandler handles autocomplete requests for Pod resources
@@ -23,21 +24,21 @@ func AutocompleteHandler(c *gin.Context) {
 	// var req model.AutoCompleteRequest
 	// if err := c.ShouldBindJSON(&req); err != nil {
 	// 	slog.Error(fmt.Errorf("failed to bind request: %w", err).Error())
-	// 	utils.HandleHTTPError(c, errors.New("failed to bind request"))
+	// 	http.HandleHTTPError(c, errors.New("failed to bind request"))
 	// 	return
 	// }
 
 	resourceParam := c.Param("resource")
 	if resourceParam == "" {
 		slog.Error("resource parameter is missing")
-		utils.HandleHTTPError(c, http.StatusBadRequest, errors.New("resource parameter is missing"))
+		httperror.HandleHTTPError(c, http.StatusBadRequest, errors.New("resource parameter is missing"))
 		return
 	}
 
-	resourceType := model.ResourceType(resourceParam)
-	if !model.IsValidResourceType(resourceType) {
+	resourceType := common.ResourceType(resourceParam)
+	if !common.IsValidResourceType(resourceType) {
 		slog.Error(fmt.Sprintf("resource type: %s not supported", resourceType))
-		utils.HandleHTTPError(c, http.StatusBadRequest, errors.New("invalid resource type"))
+		httperror.HandleHTTPError(c, http.StatusBadRequest, errors.New("invalid resource type"))
 		return
 	}
 
@@ -50,22 +51,22 @@ func AutocompleteHandler(c *gin.Context) {
 	validFilters, err := validateRequestedFilters(req.Filters)
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to validate requested filters: %w", err).Error())
-		utils.HandleHTTPError(c, http.StatusBadRequest, err)
+		httperror.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 	req.Filters = validFilters
 
-	autocompleteService, err := services.NewAutoCompleteService()
+	service, err := autocomplete.NewAutoCompleteService()
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to create autocomplete service: %w", err).Error())
-		utils.HandleHTTPError(c, http.StatusBadRequest, err)
+		httperror.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	suggestions, err := autocompleteService.GetAutocompleteSuggestions(c, req)
+	suggestions, err := service.GetAutocompleteSuggestions(c, req)
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to get autocomplete suggestions: %w", err).Error())
-		utils.HandleHTTPError(c, http.StatusBadRequest, err)
+		httperror.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 
