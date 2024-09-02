@@ -27,16 +27,30 @@ func AutocompleteHandler(c *gin.Context) {
 	// 	return
 	// }
 
+	resourceParam := c.Param("resource")
+	if resourceParam == "" {
+		slog.Error("resource parameter is missing")
+		utils.HandleHTTPError(c, http.StatusBadRequest, errors.New("resource parameter is missing"))
+		return
+	}
+
+	resourceType := model.ResourceType(resourceParam)
+	if !model.IsValidResourceType(resourceType) {
+		slog.Error(fmt.Sprintf("resource type: %s not supported", resourceType))
+		utils.HandleHTTPError(c, http.StatusBadRequest, errors.New("invalid resource type"))
+		return
+	}
+
 	// For now, hardcoding the request
 	req := model.AutoCompleteRequest{
-		ResourceType: model.PodResourceType,
+		ResourceType: resourceType,
 		Filters:      []string{"namespace", "phase", "labels", "annotations"},
 	}
 
 	validFilters, err := validateRequestedFilters(req.Filters)
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to validate requested filters: %w", err).Error())
-		utils.HandleHTTPError(c, err)
+		utils.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 	req.Filters = validFilters
@@ -44,15 +58,14 @@ func AutocompleteHandler(c *gin.Context) {
 	autocompleteService, err := services.NewAutoCompleteService()
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to create autocomplete service: %w", err).Error())
-		utils.HandleHTTPError(c, err)
+		utils.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	suggestions, err := autocompleteService.GetAutocompleteSuggestions(c, req)
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to get autocomplete suggestions: %w", err).Error())
-
-		utils.HandleHTTPError(c, err)
+		utils.HandleHTTPError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -62,6 +75,7 @@ func AutocompleteHandler(c *gin.Context) {
 		// Log the error and return the response as is
 		slog.Error(fmt.Errorf("failed to pretty-print JSON response: %w", err).Error())
 		c.JSON(http.StatusOK, suggestions)
+		return
 	}
 
 	c.Data(http.StatusOK, "application/json", prettyJSON)

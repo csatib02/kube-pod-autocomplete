@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,9 +14,9 @@ func (e *HTTPError) Error() string {
 }
 
 // HandleHTTPError is a utility function to handle HTTP errors in Gin handlers.
-func HandleHTTPError(c *gin.Context, err error) {
+func HandleHTTPError(c *gin.Context, code int, err error) {
 	httpErr := &HTTPError{
-		Code:    http.StatusInternalServerError,
+		Code:    code,
 		Message: err.Error(),
 	}
 
