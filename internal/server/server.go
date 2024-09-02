@@ -18,7 +18,7 @@ type Server struct {
 
 func New(config *config.Config) (*Server, error) {
 	// Init gin router and set up middlewares
-	// TODO: Add Auth middleware
+	// NOTE: Add Auth middleware if required
 	router := gin.New()
 	router.Use(gin.Recovery(), cors.Default())
 

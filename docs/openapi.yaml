@@ -1,0 +1,46 @@
+openapi: 3.1.0
+info:
+  title: Autocomplete API
+  version: 1.0.0
+
+paths:
+  /search/autocomplete/{resource}:
+    get:
+      summary: Get autocomplete suggestions
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:    
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        values:
+                          type: array
+                          items:
+                            type: string
+                    required:
+                      - key
+                      - values
+                required:
+                  - suggestions
+
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Successful response

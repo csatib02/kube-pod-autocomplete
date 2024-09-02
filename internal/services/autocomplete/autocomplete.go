@@ -12,9 +12,6 @@ import (
 
 type Service struct {
 	k8sClient k8s.Client
-	// TODO: Enable caching
-	// useCache          bool
-	// cacheUpdatePeriod time.Duration
 }
 
 func NewAutoCompleteService() (*Service, error) {

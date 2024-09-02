@@ -33,7 +33,7 @@ func (o *Options) RemoveDuplicateValues(suggestions *[]model.Suggestion) {
 }
 
 // RemoveIgnoredKeys removes the ignored keys from the suggestions
-// TODO: Get ignoreKeys from params
+// NOTE: IgnoreKeys should be retrieved from request parameters
 func (o *Options) RemoveIgnoredKeys(suggestions *[]model.Suggestion) {
 	filteredSuggestions := make([]model.Suggestion, 0, len(*suggestions))
 	for _, suggestion := range *suggestions {

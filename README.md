@@ -4,13 +4,14 @@ Kube Pod Autocomplete is a Go-based backend service designed to enhance the user
 
 ## TODO
 
-- OPENAPI gen.
-- Add caching.
-- Add search pods by label/ns/phase endpoint as a possible use-case.
+- Create docs.
+- Add caching idea to docs.
+
+- Reconsider project layout.
 - Add e2e-tests.
-- Consider moving main.go to cmd.
 - Consider adding garden config to simplify testing.
-- Create a Helm-Chart for Kube Pod Autocomplete
+
+- Add search pods by label/ns/phase endpoint as a possible use-case.
 
 ## Quick-start
 

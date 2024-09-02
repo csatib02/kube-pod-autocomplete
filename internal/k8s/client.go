@@ -7,7 +7,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	kubernetesConfig "sigs.k8s.io/controller-runtime/pkg/client/config"
+	"k8s.io/client-go/rest"
 
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
@@ -17,9 +17,9 @@ type Client struct {
 }
 
 func NewClient() (*Client, error) {
-	kubeConfig, err := kubernetesConfig.GetConfig()
+	kubeConfig, err := rest.InClusterConfig()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get kubeconfig: %w", err)
+		return nil, fmt.Errorf("failed to get in-cluster config: %w", err)
 	}
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
