@@ -68,7 +68,6 @@ func TestLoadConfig(t *testing.T) {
 			if ttp.wantConfig != nil {
 				assert.Equal(t, ttp.wantConfig, config, "Unexpected config")
 			}
-
 		})
 	}
 }

@@ -3,8 +3,9 @@ package autocomplete
 import (
 	"testing"
 
-	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
 
 var serviceTest = Service{}
