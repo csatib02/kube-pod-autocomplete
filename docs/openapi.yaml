@@ -1,12 +1,14 @@
 openapi: 3.1.0
 info:
-  title: Autocomplete API
+  title: Kube Pod Autocomplete API
+  description: API for getting autocomplete suggestions for Kubernetes resources
   version: 1.0.0
 
 paths:
   /search/autocomplete/{resource}:
     get:
       summary: Get autocomplete suggestions
+      operationId: getAutocompleteSuggestions
       parameters:
         - name: resource
           in: path
@@ -41,6 +43,7 @@ paths:
   /health:
     get:
       summary: Health check
+      operationId: healthCheck
       responses:
         '200':
           description: Successful response

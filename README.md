@@ -1,50 +1,18 @@
 # kube-pod-autocomplete
 
-Kube Pod Autocomplete is a Go-based backend service designed to enhance the user experience when navigating resource lists in Kubernetes clusters.
+*Kube Pod Autocomplete is a Go-based backend service designed to enhance the user experience when navigating resource lists in Kubernetes clusters.*
+
+## Getting started
+
+- Kube Pod Autocomplete is designed to be used in Kubernetes environment.
+- Take a look at the [documentation](./docs/docs.md).
 
 ## TODO
 
-- Tool to check openapi againts own implementation
-- Create docs.
-- Add caching idea to docs.
-
-- Reconsider project layout.
 - Add e2e-tests.
 - Consider adding garden config to simplify testing.
 
 - Add search pods by label/ns/phase endpoint as a possible use-case.
-
-## Quick-start
-
-Create a Cluster:
-
-```shell
-make up
-```
-
-Deploy Kube Pod Autocomplete:
-
-```shell
-make deploy
-```
-
-Deploy some pods:
-
-```shell
-make deploy-testdata
-```
-
-Port-forward to Kube Pod Autocomplete:
-
-```shell
-kubectl port-forward -n kube-pod-autocomplete $(kubectl get pods -n kube-pod-autocomplete -o jsonpath='{.items[0].metadata.name}') 8080:8080 1>/dev/null &
-```
-
-Hit the endpoint:
-
-```shell
-curl http://localhost:8080/search/autocomplete/pods
-```
 
 ## Development
 
