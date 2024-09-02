@@ -1,0 +1,10 @@
+apiVersion: v2
+type: application
+name: kube-pod-autocomplete
+version: 0.0.0
+appVersion: latest
+description: backend service designed to enhance the user experience when navigating resource lists in Kubernetes clusters.
+sources:
+  - https://github.com/csatib02/kube-pod-autocomplete
+maintainers:
+  - name: csatib02

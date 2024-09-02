@@ -22,7 +22,8 @@ down: ## Stop development environment
 
 .PHONY: deploy
 deploy: ## Deploy kube-pod-autocomplete to the development environment
-	kubectl apply -f deploy/
+	kubectl create ns kube-pod-autocomplete
+	${HELM_BIN} upgrade --install kube-pod-autocomplete deploy/charts/kube-pod-autocomplete --namespace kube-pod-autocomplete
 
 .PHONY: deploy-testdata
 deploy-testdata: ## Deploy testdata to the development environment
@@ -38,8 +39,13 @@ build: ## Build binary
 	go build -race -o build/kube-pod-autocomplete .
 
 .PHONY: artifacts
-artifacts: container-image binary-snapshot
+artifacts: container-image helm-chart binary-snapshot
 artifacts: ## Build artifacts
+
+.PHONY: helm-chart
+helm-chart: ## Build Helm chart
+	@mkdir -p build
+	$(HELM_BIN) package -d build/ deploy/charts/kube-pod-autocomplete
 
 .PHONY: container-image
 container-image: ## Build container image
@@ -62,9 +68,16 @@ test: ## Run tests
 test-e2e: ## Run end-to-end tests
 	go test -race -v -timeout 900s -tags e2e ./e2e/
 
+.PHONY: lint
+list: lint-go lint-helm ## Run linters
+
 .PHONY: lint-go
 lint-go:
 	$(GOLANGCI_LINT_BIN) run $(if ${CI},--out-format github-actions,)
+
+.PHONY: lint-helm
+lint-helm:
+	$(HELM_BIN) lint deploy/charts/kube-pod-autocomplete
 
 .PHONY: fmt
 fmt: ## Format code
@@ -85,6 +98,7 @@ GORELEASER_VERSION = 2.2.0
 GOLANGCI_LINT_BIN := golangci-lint
 KIND_BIN := kind
 GORELEASER_BIN := goreleaser
+HELM_BIN := helm
 
 bin/golangci-lint:
 	@mkdir -p bin
@@ -117,3 +131,8 @@ bin/goreleaser:
 	@mkdir -p bin
 	curl -sfL https://goreleaser.com/static/run -o bin/goreleaser
 	@chmod +x bin/goreleaser
+
+bin/helm:
+	@mkdir -p bin
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | USE_SUDO=false HELM_INSTALL_DIR=bin bash
+	@chmod +x bin/helm

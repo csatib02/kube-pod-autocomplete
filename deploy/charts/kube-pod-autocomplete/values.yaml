@@ -1,0 +1,30 @@
+# Namespace where the application will be deployed
+namespace: kube-pod-autocomplete
+
+# General settings for the service
+name: kube-pod-autocomplete
+replicas: 1
+image: csatib02/kube-pod-autocomplete:v0.1.0
+containerPort: 8080
+servicePort: 8080
+
+# Service settings
+service:
+  type: ClusterIP
+
+# Service Account settings
+serviceAccount:
+  name: kube-pod-autocomplete-sa
+
+# RBAC settings
+rbac:
+  clusterRoleName: kube-pod-autocomplete-clusterrole
+  resourceTypes:
+    - "pods"
+  clusterRoleBindingName: kube-pod-autocomplete-clusterrolebinding
+
+# Resource limits for the application
+resources:
+  limits:
+    cpu: "1"
+    memory: "512Mi"
