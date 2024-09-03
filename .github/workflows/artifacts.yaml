@@ -81,43 +81,6 @@ jobs:
           name: Kube-Pod-Autocomplete Image
           path: image.tar
 
-  binary:
-    name: Binary
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: '.go-version'
-
-      - name: Run GoReleaser ~ Build
-        uses: goreleaser/goreleaser-action@v6
-        if : ${{ inputs.publish == false }}
-        with:
-          distribution: goreleaser
-          version: '~> v2'
-          args: release --skip=publish --snapshot
-
-      - name: Run GoReleaser ~ Release
-        uses: goreleaser/goreleaser-action@v6
-        if: ${{ inputs.publish == true }}
-        with:
-          distribution: goreleaser
-          version: '~> v2'
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Kube-Pod-Autocomplete Binary
-          path: build/dist/*
-
   helm-chart:
     name: Helm-Chart
     runs-on: ubuntu-latest

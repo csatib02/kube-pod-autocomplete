@@ -41,7 +41,7 @@ build: ## Build binary
 	go build -race -o build/kube-pod-autocomplete .
 
 .PHONY: artifacts
-artifacts: container-image helm-chart binary-snapshot
+artifacts: container-image helm-chart
 artifacts: ## Build artifacts
 
 .PHONY: container-image
@@ -52,10 +52,6 @@ container-image: ## Build container image
 helm-chart: ## Build Helm chart
 	@mkdir -p build
 	$(HELM_BIN) package -d build/ deploy/charts/kube-pod-autocomplete
-
-.PHONY: binary-snapshot
-binary-snapshot: ## Build binary snapshot
-	VERSION=v${GORELEASER_VERSION} ${GORELEASER_BIN} release --clean --skip=publish --snapshot
 
 ##@ Checks
 
@@ -91,19 +87,16 @@ fmt: ## Format code
 
 ##@ Dependencies
 
-deps: bin/golangci-lint bin/kind bin/cosign bin/goreleaser
+deps: bin/golangci-lint bin/kind
 deps: ## Install dependencies
 
 # Dependency versions
 GOLANGCI_LINT_VERSION = 1.60.3
 KIND_VERSION = 0.24.0
-COSIGN_VERSION = 2.4.0
-GORELEASER_VERSION = 2.2.0
 
 # Dependency binaries
 GOLANGCI_LINT_BIN := golangci-lint
 KIND_BIN := kind
-GORELEASER_BIN := goreleaser
 HELM_BIN := helm
 
 bin/golangci-lint:
@@ -114,29 +107,6 @@ bin/kind:
 	@mkdir -p bin
 	curl -Lo bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-$(shell uname -s | tr '[:upper:]' '[:lower:]')-$(shell uname -m | sed -e "s/aarch64/arm64/; s/x86_64/amd64/")
 	@chmod +x bin/kind
-
-# Goreleaser uses cosign for signing binaries
-bin/cosign:
-	@mkdir -p bin
-	@OS=$$(uname -s); \
-	case $$OS in \
-		"Linux") \
-			curl -sSfL https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64 -o bin/cosign; \
-			;; \
-		"Darwin") \
-			curl -sSfL https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-darwin-arm64 -o bin/cosign; \
-			;; \
-		*) \
-			echo "Unsupported OS: $$OS"; \
-			exit 1; \
-			;; \
-	esac
-	@chmod +x bin/cosign
-
-bin/goreleaser:
-	@mkdir -p bin
-	curl -sfL https://goreleaser.com/static/run -o bin/goreleaser
-	@chmod +x bin/goreleaser
 
 bin/helm:
 	@mkdir -p bin
