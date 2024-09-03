@@ -6,7 +6,7 @@ import (
 	"github.com/csatib02/kube-pod-autocomplete/internal/services/autocomplete/model"
 )
 
-// FilterOptions defines additional options for filtering suggestions
+// Options defines additional options for filtering suggestions
 type Options struct{}
 
 var ignoredKeys = map[string][]string{
@@ -33,7 +33,7 @@ func (o *Options) RemoveDuplicateValues(suggestions *[]model.Suggestion) {
 }
 
 // RemoveIgnoredKeys removes the ignored keys from the suggestions
-// NOTE: IgnoreKeys should be retrieved from request parameters
+// NOTE: ignoredKeys should be retrieved from request parameters
 func (o *Options) RemoveIgnoredKeys(suggestions *[]model.Suggestion) {
 	filteredSuggestions := make([]model.Suggestion, 0, len(*suggestions))
 	for _, suggestion := range *suggestions {

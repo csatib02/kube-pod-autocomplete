@@ -13,7 +13,6 @@ func NewFieldFilters(resourceType common.ResourceType, requestedFilters *[]strin
 	switch resourceType {
 	case common.PodResourceType:
 		return podfilter.GetFilters(requestedFilters), nil
-	// Add cases for other resource types here
 	default:
 		return nil, errors.New("unsupported resource type")
 	}

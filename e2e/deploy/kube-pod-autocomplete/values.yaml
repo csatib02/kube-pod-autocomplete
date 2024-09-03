@@ -2,13 +2,12 @@ namespace: kube-pod-autocomplete
 
 name: kube-pod-autocomplete
 replicas: 1
-containerPort: 8080
 
 service:
   name: kube-pod-autocomplete-service
   type: ClusterIP
   servicePort: 8080
-  externalPort: 8080
+  containerPort: 8080
 
 serviceAccount:
   name: kube-pod-autocomplete-sa
