@@ -28,11 +28,6 @@ func NewAutoCompleteService() (*Service, error) {
 
 // GetAutocompleteSuggestions returns a list of suggestions (for the given query)
 func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.AutoCompleteRequest) (*model.AutocompleteSuggestions, error) {
-	// if no ResourceType is provided, default to Pod
-	if req.ResourceType == "" {
-		req.ResourceType = common.PodResourceType
-	}
-
 	filters, err := filter.NewFieldFilters(req.ResourceType, &req.Filters)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get field filters: %w", err)
@@ -46,7 +41,7 @@ func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.Auto
 	return s.extractSuggestions(resources, filters)
 }
 
-// extractSuggestions extracts suggestions from the given pods based on the requested filters
+// extractSuggestions extracts suggestions from the given resources based on the requested filters
 func (s *Service) extractSuggestions(resources common.Resources, filters *map[string]model.FieldFilter) (*model.AutocompleteSuggestions, error) {
 	suggestions := make([]model.Suggestion, 0, len(*filters))
 	for fieldName, fieldFilter := range *filters {
@@ -76,7 +71,7 @@ func (s *Service) extractSuggestions(resources common.Resources, filters *map[st
 		}
 	}
 
-	// These should be filter options on the UI
+	// These should be options on the UI
 	filterOptions := filter.Options{}
 
 	filterOptions.RemoveDuplicateValues(&suggestions)

@@ -7,15 +7,7 @@
 - Kube Pod Autocomplete is designed to be used in Kubernetes environment.
 - Take a look at the [documentation](./docs/docs.md).
 
-## TODO
-
-- Consider adding garden config to simplify testing.
-
-- Add search pods by label/ns/phase endpoint as a possible use-case.
-
 ## Development
-
-Make sure Docker is installed.
 
 Fetch required tools:
 

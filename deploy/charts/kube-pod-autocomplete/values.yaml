@@ -4,7 +4,6 @@ namespace: kube-pod-autocomplete
 # General settings for the application
 name: kube-pod-autocomplete
 replicas: 1
-containerPort: 8080
 
 # image
 image:
@@ -17,7 +16,7 @@ service:
   name: kube-pod-autocomplete-service
   type: ClusterIP
   servicePort: 8080
-  externalPort: 8080
+  containerPort: 8080
 
 # Service Account settings
 serviceAccount:

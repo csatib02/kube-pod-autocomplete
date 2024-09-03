@@ -31,9 +31,9 @@ const (
 func TestKPAEndpoints(t *testing.T) {
 	endpoints := applyResource(features.New("validate endpoint functionality")).
 		Assess("pods are available", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			// check if test pods are running
+			// Check if test pods are running
 			err := wait.PollUntilContextTimeout(ctx, pollInterval, defaultTimeout, true, func(ctx context.Context) (bool, error) {
-				// get all pods with label: team=test
+				// Get all pods with label: team=test
 				pods := &corev1.PodList{}
 				err := cfg.Client().Resources().List(ctx, pods, func(opts *metav1.ListOptions) {
 					opts.LabelSelector = labels.Set{"team": "test"}.String()
@@ -53,18 +53,15 @@ func TestKPAEndpoints(t *testing.T) {
 			return ctx
 		}).Assess("check KPA response", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 
-		// start port forwarding
 		killProcess := startPortForwardingToService(t, "kube-pod-autocomplete-service", "kube-pod-autocomplete", "8080:8080")
 		defer killProcess()
 
-		// hit the /health endpoint
 		resp, err := http.Get(fmt.Sprintf(healthURL, "localhost", 8080))
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
-		// hit the /search/autocomplete/pods endpoint
 		autocompleteUrl := fmt.Sprintf(autocompleteURL, "localhost", 8080, "pods")
 		resp, err = http.Get(autocompleteUrl)
 		require.NoError(t, err)
@@ -72,7 +69,7 @@ func TestKPAEndpoints(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
-		// check if the response body contains the expected filters
+		// Check if the response body contains the expected filters
 		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)
 
@@ -112,7 +109,7 @@ func applyResource(builder *features.FeatureBuilder) *features.FeatureBuilder {
 func startPortForwardingToService(t *testing.T, svcName, ns, portMapping string) func() {
 	args := []string{"port-forward", fmt.Sprintf("svc/%s", svcName), portMapping, "-n", ns}
 	cmd := exec.Command("kubectl", args...)
-	cmd.Stderr = os.Stderr // redirect stderr to test output
+	cmd.Stderr = os.Stderr // Redirect stderr to test output
 	err := cmd.Start()
 	require.NoError(t, err)
 

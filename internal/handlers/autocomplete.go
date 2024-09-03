@@ -70,7 +70,6 @@ func AutocompleteHandler(c *gin.Context) {
 		return
 	}
 
-	// Pretty-print the JSON response
 	prettyJSON, err := json.MarshalIndent(suggestions, "", "  ")
 	if err != nil {
 		// Log the error and return the response as is
@@ -79,10 +78,9 @@ func AutocompleteHandler(c *gin.Context) {
 		return
 	}
 
-	c.Data(http.StatusOK, "application/json", prettyJSON)
+	c.Data(http.StatusOK, gin.MIMEJSON, prettyJSON)
 }
 
-// validateRequestedFilters validates the requestedFilters parameter
 func validateRequestedFilters(requestedFilters []string) ([]string, error) {
 	validFilters := make([]string, 0, len(requestedFilters))
 	for _, filter := range requestedFilters {

@@ -11,7 +11,7 @@ func (e *Error) Error() string {
 	return e.Message
 }
 
-// HandleHTTPError is a utility function to handle HTTP errors in Gin handlers.
+// HandleHTTPError is a utility function to handle HTTP errors in Gin handlers
 func HandleHTTPError(c *gin.Context, code int, err error) {
 	httpErr := &Error{
 		Code:    code,

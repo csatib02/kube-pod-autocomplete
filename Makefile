@@ -1,6 +1,7 @@
 export PATH := $(abspath bin/):${PATH}
 
-CONTAINER_IMAGE_REF = ghcr.io/csatib02/kube-pod-autocomplete:dev
+PROJECT_NAME = kube-pod-autocomplete
+CONTAINER_IMAGE_REF = ghcr.io/csatib02/${PROJECT_NAME}:dev
 
 ##@ General
 
@@ -16,16 +17,17 @@ help: ## Display this help
 
 .PHONY: up
 up: ## Start development environment
-	${KIND_BIN} create cluster --name kube-pod-autocomplete
+	${KIND_BIN} create cluster --name ${PROJECT_NAME}
 
 .PHONY: down
 down: ## Stop development environment
-	${KIND_BIN} delete cluster --name kube-pod-autocomplete
+	${KIND_BIN} delete cluster --name ${PROJECT_NAME}
 
 .PHONY: deploy
-deploy: ## Deploy kube-pod-autocomplete to the development environment
-	kubectl create ns kube-pod-autocomplete
-	${HELM_BIN} upgrade --install kube-pod-autocomplete deploy/charts/kube-pod-autocomplete --namespace kube-pod-autocomplete
+deploy: container-image ## Deploy kube-pod-autocomplete to the development environment
+	kind load docker-image ${CONTAINER_IMAGE_REF} --name ${PROJECT_NAME}
+	kubectl create ns ${PROJECT_NAME}
+	${HELM_BIN} upgrade --install ${PROJECT_NAME} deploy/charts/${PROJECT_NAME} --namespace ${PROJECT_NAME} --set image.tag=dev
 
 .PHONY: deploy-testdata
 deploy-testdata: ## Deploy testdata to the development environment
@@ -38,7 +40,7 @@ deploy-testdata: ## Deploy testdata to the development environment
 .PHONY: build
 build: ## Build binary
 	@mkdir -p build
-	go build -race -o build/kube-pod-autocomplete .
+	go build -race -o build/${PROJECT_NAME} .
 
 .PHONY: artifacts
 artifacts: container-image helm-chart
@@ -51,7 +53,7 @@ container-image: ## Build container image
 .PHONY: helm-chart
 helm-chart: ## Build Helm chart
 	@mkdir -p build
-	$(HELM_BIN) package -d build/ deploy/charts/kube-pod-autocomplete
+	$(HELM_BIN) package -d build/ deploy/charts/${PROJECT_NAME}
 
 ##@ Checks
 
@@ -79,7 +81,7 @@ lint-go:
 
 .PHONY: lint-helm
 lint-helm:
-	$(HELM_BIN) lint deploy/charts/kube-pod-autocomplete
+	$(HELM_BIN) lint deploy/charts/${PROJECT_NAME}
 
 .PHONY: fmt
 fmt: ## Format code
