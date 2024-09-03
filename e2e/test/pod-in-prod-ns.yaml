@@ -1,15 +1,17 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-in-default-ns
-  namespace: default
+  name: pod-in-prod-ns
+  namespace: prod
+  labels:
+    team: test
 spec:
   containers:
-  - name: pod-in-default-ns
+  - name: pod-in-prod-ns
     image: nginx
     ports:
     - containerPort: 80
     resources:
       limits:
-        cpu: "1"
+        cpu: "250m"
         memory: "512Mi"

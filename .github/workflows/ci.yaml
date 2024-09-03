@@ -56,9 +56,22 @@ jobs:
         with:
           version: latest
 
+  artifacts:
+    name: Artifacts
+    uses: ./.github/workflows/artifacts.yaml
+    with:
+      publish: false
+    permissions:
+      contents: read
+      packages: write
+
   e2e-test:
     name: E2E Test
     runs-on: ubuntu-latest
+    needs: artifacts
+    strategy:
+      matrix:
+        KIND_K8S_VERSION: ["v1.28.9", "v1.29.4", "v1.30.0"]
 
     steps:
       - name: Checkout repository
@@ -69,14 +82,23 @@ jobs:
         with:
           go-version-file: '.go-version'
 
+      - name: Download Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: Kube-Pod-Autocomplete Image
+
+      - name: Download Helm chart
+        uses: actions/download-artifact@v4
+        with:
+          name: Kube-Pod-Autocomplete Helm-Chart
+
+      - name: Install Kubectl
+        run: curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
       - name: Run E2E tests
         run: make test-e2e
-
-  artifacts:
-    name: Artifacts
-    uses: ./.github/workflows/artifacts.yaml
-    with:
-      publish: false
-    permissions:
-      contents: read
-      packages: write
+        env:
+          KIND_K8S_VERSION: ${{ matrix.KIND_K8S_VERSION }}
+          LOAD_IMAGE_ARCHIVE: ${{ github.workspace }}/image.tar
+          VERSION: ${{ needs.artifacts.outputs.container-image-tag }}
+          HELM_CHART: ${{ github.workspace }}/kube-pod-autocomplete-0.0.0.tgz
