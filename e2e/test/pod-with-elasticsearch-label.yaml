@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-elasticsearch-label
+  namespace: default
+  labels:
+    app.kubernetes.io/name: elasticsearch
+    team: test
+spec:
+  containers:
+  - name: pod-with-elasticsearch-label
+    image: nginx
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        cpu: "250m"
+        memory: "512Mi"

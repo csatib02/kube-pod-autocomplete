@@ -1,42 +1,27 @@
-# Namespace where the application will be deployed
 namespace: kube-pod-autocomplete
 
-# General settings for the application
 name: kube-pod-autocomplete
 replicas: 1
 containerPort: 8080
 
-# image
-image:
-  repository: ghcr.io/csatib02/kube-pod-autocomplete
-  tag: ""
-  pullPolicy: IfNotPresent
-
-# Service settings
 service:
   name: kube-pod-autocomplete-service
   type: ClusterIP
   servicePort: 8080
   externalPort: 8080
 
-# Service Account settings
 serviceAccount:
   name: kube-pod-autocomplete-sa
 
-# Ingress settings
 ingress:
   enabled: false
-  name: kube-pod-autocomplete-ingress
-  host: ""
 
-# RBAC settings
 rbac:
   clusterRoleName: kube-pod-autocomplete-clusterrole
   resourceTypes:
     - "pods"
   clusterRoleBindingName: kube-pod-autocomplete-clusterrolebinding
 
-# Resource limits for the application
 resources:
   limits:
     cpu: "1"

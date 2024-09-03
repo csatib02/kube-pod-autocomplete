@@ -1,16 +1,17 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-with-nginx-label
+  name: pod-in-default-ns
+  namespace: default
   labels:
-    app.kubernetes.io/name: nginx
+    team: test
 spec:
   containers:
-  - name: pod-with-nginx-label
+  - name: pod-in-default-ns
     image: nginx
     ports:
     - containerPort: 80
     resources:
       limits:
-        cpu: "1"
+        cpu: "250m"
         memory: "512Mi"

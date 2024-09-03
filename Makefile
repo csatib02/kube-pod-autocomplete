@@ -1,5 +1,7 @@
 export PATH := $(abspath bin/):${PATH}
 
+CONTAINER_IMAGE_REF = ghcr.io/csatib02/kube-pod-autocomplete:dev
+
 ##@ General
 
 # Targets commented with ## will be visible in "make help" info.
@@ -29,7 +31,7 @@ deploy: ## Deploy kube-pod-autocomplete to the development environment
 deploy-testdata: ## Deploy testdata to the development environment
 	kubectl create ns staging
 	kubectl create ns prod
-	kubectl apply -f test/testdata/
+	kubectl apply -f e2e/test/
 
 ##@ Build
 
@@ -42,14 +44,14 @@ build: ## Build binary
 artifacts: container-image helm-chart binary-snapshot
 artifacts: ## Build artifacts
 
+.PHONY: container-image
+container-image: ## Build container image
+	docker build -t ${CONTAINER_IMAGE_REF} .
+
 .PHONY: helm-chart
 helm-chart: ## Build Helm chart
 	@mkdir -p build
 	$(HELM_BIN) package -d build/ deploy/charts/kube-pod-autocomplete
-
-.PHONY: container-image
-container-image: ## Build container image
-	docker build .
 
 .PHONY: binary-snapshot
 binary-snapshot: ## Build binary snapshot
@@ -58,7 +60,7 @@ binary-snapshot: ## Build binary snapshot
 ##@ Checks
 
 .PHONY: check
-check: test lint-go ## Run tests and lint check
+check: test lint ## Run tests and lint check
 
 .PHONY: test
 test: ## Run tests
@@ -68,8 +70,12 @@ test: ## Run tests
 test-e2e: ## Run end-to-end tests
 	go test -race -v -timeout 900s -tags e2e ./e2e/
 
+.PHONY: test-e2e-local
+test-e2e-local: container-image ## Run e2e tests locally
+	LOAD_IMAGE=${CONTAINER_IMAGE_REF} VERSION=dev ${MAKE} test-e2e
+
 .PHONY: lint
-list: lint-go lint-helm ## Run linters
+lint: lint-go lint-helm ## Run linters
 
 .PHONY: lint-go
 lint-go:

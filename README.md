@@ -9,7 +9,6 @@
 
 ## TODO
 
-- Add e2e-tests.
 - Consider adding garden config to simplify testing.
 
 - Add search pods by label/ns/phase endpoint as a possible use-case.
