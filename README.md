@@ -4,7 +4,7 @@
 
 ## Getting started
 
-- Kube Pod Autocomplete is designed to be used in Kubernetes environment.
+- Kube Pod Autocomplete is designed to be used in Kubernetes environments.
 - Take a look at the [documentation](./docs/docs.md).
 
 ## Development
@@ -49,7 +49,7 @@ make fmt
 Build artifacts locally:
 
 ```shell
-make container-image
+make artifacts
 ```
 
 Once you are done, you can tear down the development environment:
