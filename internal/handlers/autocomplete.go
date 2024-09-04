@@ -24,7 +24,7 @@ func AutocompleteHandler(c *gin.Context) {
 	// var req model.AutoCompleteRequest
 	// if err := c.ShouldBindJSON(&req); err != nil {
 	// 	slog.Error(fmt.Errorf("failed to bind request: %w", err).Error())
-	// 	http.HandleHTTPError(c, errors.New("failed to bind request"))
+	// 	http.HandleHTTPError(c, http.StatusBadRequest, errors.New("failed to bind request"))
 	// 	return
 	// }
 
@@ -59,14 +59,14 @@ func AutocompleteHandler(c *gin.Context) {
 	service, err := autocomplete.NewAutoCompleteService()
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to create autocomplete service: %w", err).Error())
-		httperror.HandleHTTPError(c, http.StatusBadRequest, err)
+		httperror.HandleHTTPError(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	suggestions, err := service.GetAutocompleteSuggestions(c, req)
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to get autocomplete suggestions: %w", err).Error())
-		httperror.HandleHTTPError(c, http.StatusBadRequest, err)
+		httperror.HandleHTTPError(c, http.StatusInternalServerError, err)
 		return
 	}
 

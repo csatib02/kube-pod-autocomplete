@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
@@ -35,7 +36,7 @@ func (c *Client) ListResource(ctx context.Context, resource common.Resources) (c
 	case common.ResourceType:
 		return c.listPods(ctx)
 	default:
-		return nil, fmt.Errorf("unsupported resource type")
+		return nil, fmt.Errorf("unsupported resource type: %T", resource)
 	}
 }
 
@@ -47,7 +48,7 @@ func (c *Client) listPods(ctx context.Context) (*v1.PodList, error) {
 
 	// Validate whether there are any pods in the cluster
 	if pods == nil {
-		return nil, fmt.Errorf("failed to list pods: no pods found")
+		return nil, errors.New("no pods found in the cluster")
 	}
 
 	return pods, nil
