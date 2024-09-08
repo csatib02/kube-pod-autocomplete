@@ -1,6 +1,6 @@
 # Kube Pod Autocomplete documentation
 
-Kube Pod Autocomplete is a service designed to enhance the user experience when navigating resource lists in Kubernetes clusters. It retrieves specific data based on the requested resource type and supported filters.
+This service retrieves specific data based on the requested resource type and supported filters.
 
 ## Supported resources
 

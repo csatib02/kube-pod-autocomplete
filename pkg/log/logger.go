@@ -65,8 +65,7 @@ func InitLogger(config *config.Config) {
 		router = router.Add(slogsyslog.Option{Level: slog.LevelInfo, Writer: writer}.NewSyslogHandler())
 	}
 
-	logger := slog.New(router.Handler())
-	logger = logger.With(slog.String("app", "kube-pod-autocomplete"))
+	logger := slog.New(router.Handler()).With(slog.String("app", "kube-pod-autocomplete"))
 
 	// Set the default logger to the configured logger,
 	// enabling direct usage of the slog package for logging.

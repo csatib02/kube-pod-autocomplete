@@ -35,7 +35,7 @@ func (s *Service) GetAutocompleteSuggestions(ctx context.Context, req model.Auto
 
 	resources, err := s.k8sClient.ListResource(ctx, req.ResourceType)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list pods: %w", err)
+		return nil, fmt.Errorf("failed to list resources: %w", err)
 	}
 
 	return s.extractSuggestions(resources, filters)

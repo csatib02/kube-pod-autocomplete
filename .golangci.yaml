@@ -7,7 +7,7 @@ linters-settings:
       - default
       - prefix(github.com/csatib02/kube-pod-autocomplete)
   goimports:
-    local-prefixes: github.com/bank-vaults/kube-pod-autocomplete
+    local-prefixes: github.com/csatib02/kube-pod-autocomplete
   misspell:
     locale: US
   nolintlint:

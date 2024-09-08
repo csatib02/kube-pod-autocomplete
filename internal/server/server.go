@@ -21,6 +21,7 @@ func New(config *config.Config) (*Server, error) {
 	// NOTE: Add Auth middleware if required
 	router := gin.New()
 	router.Use(gin.Recovery(), cors.Default())
+	gin.SetMode(config.Mode)
 
 	if config.LogServerAddress != "" {
 		writer, err := net.Dial("udp", config.LogServerAddress)
@@ -33,24 +34,17 @@ func New(config *config.Config) (*Server, error) {
 		router.Use(gin.Logger())
 	}
 
-	// Set the mode of the gin router, default is debug
-	if config.Mode == gin.ReleaseMode {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
 	// Add trusted proxies e.g. when running KPA behind a reverse proxy or a load balancer
 	if err := router.SetTrustedProxies(config.TrustedProxies); err != nil {
 		return nil, fmt.Errorf("failed to set trusted proxies: %w", err)
 	}
 
-	handlers.SetupRouter(router)
+	handlers.SetupRoutes(router)
 
-	server := &Server{
+	return &Server{
 		router: router,
 		config: config,
-	}
-
-	return server, nil
+	}, nil
 }
 
 func (s *Server) Run() error {

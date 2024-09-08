@@ -62,8 +62,7 @@ func TestKPAEndpoints(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
-		autocompleteUrl := fmt.Sprintf(autocompleteURL, "localhost", 8080, "pods")
-		resp, err = http.Get(autocompleteUrl)
+		resp, err = http.Get(fmt.Sprintf(autocompleteURL, "localhost", 8080, "pods"))
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
