@@ -15,12 +15,13 @@ const (
 )
 
 type Config struct {
-	ListenAddress    string   `mapstructure:"listen_address"`
-	TrustedProxies   []string `mapstructure:"trusted_proxies"`
-	Mode             string   `mapstructure:"mode"`
-	LogLevel         string   `mapstructure:"log_level"`
-	JSONLog          bool     `mapstructure:"json_log"`
-	LogServerAddress string   `mapstructure:"log_server"`
+	ListenAddress      string   `mapstructure:"listen_address"`
+	TrustedProxies     []string `mapstructure:"trusted_proxies"`
+	Mode               string   `mapstructure:"mode"`
+	LogLevel           string   `mapstructure:"log_level"`
+	JSONLog            bool     `mapstructure:"json_log"`
+	LogServerAddress   string   `mapstructure:"log_server_address"`
+	LogServerTransport string   `mapstructure:"log_server_transport"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -47,7 +48,9 @@ func LoadConfig() (*Config, error) {
 
 	_ = v.BindEnv("json_log")
 
-	_ = v.BindEnv("log_server")
+	_ = v.BindEnv("log_server_address")
+
+	_ = v.BindEnv("log_server_transport")
 
 	config := &Config{}
 	if err := v.Unmarshal(config); err != nil {

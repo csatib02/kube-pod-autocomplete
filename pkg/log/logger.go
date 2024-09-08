@@ -56,7 +56,7 @@ func InitLogger(config *config.Config) {
 	}
 
 	if config.LogServerAddress != "" {
-		writer, err := net.Dial("udp", config.LogServerAddress)
+		writer, err := net.Dial(config.LogServerTransport, config.LogServerAddress)
 		if err != nil {
 			slog.Error(fmt.Errorf("failed to connect to log server: %w", err).Error())
 			os.Exit(1)
