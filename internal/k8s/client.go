@@ -31,12 +31,12 @@ func NewClient() (*Client, error) {
 	return &Client{clientset: clientset}, nil
 }
 
-func (c *Client) ListResource(ctx context.Context, resource common.Resources) (common.Resources, error) {
-	switch resource.(type) {
-	case common.ResourceType:
+func (c *Client) ListResource(ctx context.Context, resource common.ResourceType) (common.Resources, error) {
+	switch resource {
+	case common.PodResourceType:
 		return c.listPods(ctx)
 	default:
-		return nil, fmt.Errorf("unsupported resource type: %T", resource)
+		return nil, fmt.Errorf("unsupported resource type: %s", resource)
 	}
 }
 

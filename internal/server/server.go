@@ -24,7 +24,7 @@ func New(config *config.Config) (*Server, error) {
 	gin.SetMode(config.Mode)
 
 	if config.LogServerAddress != "" {
-		writer, err := net.Dial("udp", config.LogServerAddress)
+		writer, err := net.Dial(config.LogServerTransport, config.LogServerAddress)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to log server: %w", err)
 		}
